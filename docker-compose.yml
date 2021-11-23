@@ -1,0 +1,52 @@
+version: "2"
+
+services:
+  server:
+    build: ./server
+    image: backend
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./server/:/usr/src/app
+      - /usr/src/mern/server/node_modules
+    depends_on:
+      - mongo
+    links:
+      - mongo
+    env_file:
+      - ./server/.env
+    environment:
+      - NODE_ENV=development
+    networks:
+      - appnetwork
+  mongo:
+    image: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - data-volume:/data/db
+    networks:
+      - appnetwork
+  client:
+    build: ./client
+    image: frontend
+    ports:
+      - "3000:3000"
+    env_file: ./client/.env
+    volumes:
+      - ./client/:/usr/app
+      - /usr/mern/client/node_modules
+    depends_on:
+      - server
+    networks:
+      - appnetwork
+
+networks:
+  appnetwork:
+    driver: bridge
+
+volumes:
+  data-volume:
+  node_modules:
+  web-root:
+    driver: local
